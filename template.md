@@ -13,7 +13,7 @@ int compare(const T &lhs, const T &rhs)
 ```
 > 模板定义中，模板参数列表不能为空
 
-### 1.2 实例化函数模板
+### 1.1.1 实例化函数模板
 > 当我们调用一个函数模板时，编译器（通常）用函数实参来为我们推断模板实参
 >
 编译器会推断出模板实参为int，并将int绑定到模板参数T上  
@@ -21,7 +21,7 @@ int compare(const T &lhs, const T &rhs)
 ```c++
 std::cout << compare(1,0) << std::endl;	
 ```
-### 1.3 模板类型参数（type parameter）
+### 1.1.2 模板类型参数（type parameter）
 > 我们可以把类型参数看作类型说明符。和类型说明符一样，类型参数可以用来指定返回类型或函数的参数类型，以及在函数体内用于变量声明或类型转换  
 >
 
@@ -31,7 +31,7 @@ std::cout << compare(1,0) << std::endl;
 template <typename T, class U>
 T example_template(const T &, const U &);
 ```
-### 1.4 非类型模板参数（nontype parameter）
+### 1.1.3 非类型模板参数（nontype parameter）
 > 一个非类型模板参数表示一个值而非一个类型，我们通过一个特定的类型名而非关键字class或typename来指定非类型参数
 ```c++
 template<typename T, unsigned NUM>
@@ -45,12 +45,12 @@ T example_template(const char s[NUM])
 > 绑定到非类型整形参数的实参必须是一个常量表达式，绑定到指针或引用的非类型参数的实参必须具有静态生存期。我们不能用一个普通（非静态）局部变量
 或动态对象作为指针或引用非类型模板参数的实参。指针参数也可以用nullptr或一个值为0的常量表达式来实例化
 >
-### 1.5 内联和constexpr的函数模板
+### 1.1.4 内联和constexpr的函数模板
 ```c++
 template <typename T, class U>
 inline T example_template(const T &, const U &);
 ```
-### 1.6 编写与类型无关的代码
+### 1.1.5 编写与类型无关的代码
 > 模板程序应该尽量减少对实参类型的要求。通过将函数参数设为const的引用，我们保证了函数可以用于不能拷贝的类型。在处理大对象，这种设计策略还能提高函数运行效率
 ```c++
 template <typename T>
@@ -61,13 +61,50 @@ int compare(const T &lhs, const T &rhs)
 	return 0;
 }
 ```
-### 1.7 模板编译
+### 1.1.6 模板编译
 > 当编译器遇到一个模板定义时，编译器并不生成代码。只有当我们实例化出一个模板的特定版本（使用模板），编译器才会生成代码
 
 >编译器只要知道函数的声明，就能调用函数（运行时会报错： 无法解析的外部符号 "return_type cdecl function_name(params)" ，该符号在函数 main 中被引用）  
 编译器需要知道类的定义，才能使用一个类类型对象，但成员函数不必已经出现  
 编译器需要掌握函数模板或类模板成员函数的定义，才能生成一个实例化版本  
-所以函数模板和类模板成员函数的定义通常放在头文件中
+所以函数模板和类模板成员函数的定义通常放在头文件中  
+### 1.1.7 编译器报错
+> 1  编译模板本身，编译器检查语法错误  
+2  编译器遇到模板使用时，编译器通常会检查模板实参数目是否正确，类型是否匹配
+3  编译器在模板实例化时，才能发现类型相关的错误，大部分报错也是在这个阶段报告的
+
+### 1.1 类模板（class template）
+> Template Class的声明
+```c++
+template <typename T> class vector;
+}
+```
+> Template Class的定义
+```c++
+template <typename T>
+class vector
+{
+public:
+	void push_back(T const&);
+	void clear();				
+	
+private:
+	T* elements;
+};
+```
+> Template Class的实例化
+```c++
+vector<int> intArray;
+vector<float> floatArray;
+
+intArray.push_back(5);
+floatArray.push_back(3.0f);
+```
+
+
+
+
+
 
 
 
