@@ -66,20 +66,20 @@ int compare(const T &lhs, const T &rhs)
 
 >编译器只要知道函数的声明，就能调用函数（运行时会报错： 无法解析的外部符号 "return_type cdecl function_name(params)" ，该符号在函数 main 中被引用）  
 编译器需要知道类的定义，才能使用一个类类型对象，但成员函数不必已经出现  
-编译器需要掌握函数模板或类模板成员函数的定义，才能生成一个实例化版本  
+编译器需要掌握函数模板或类模板成员函数的定义，才能生成一个实例化版本。  
 所以函数模板和类模板成员函数的定义通常放在头文件中  
 ### 1.1.7 编译器报错
 > 1  编译模板本身，编译器检查语法错误  
 2  编译器遇到模板使用时，编译器通常会检查模板实参数目是否正确，类型是否匹配
 3  编译器在模板实例化时，才能发现类型相关的错误，大部分报错也是在这个阶段报告的
 
-### 1.1 类模板（class template）
-> Template Class的声明
+### 1.2 类模板（class template）
+### 1.2.1 Template Class的声明
 ```c++
 template <typename T> class vector;
 }
 ```
-> Template Class的定义
+### 1.2.2 Template Class的定义
 ```c++
 template <typename T>
 class vector
@@ -92,7 +92,7 @@ private:
 	T* elements;
 };
 ```
-> Template Class的实例化
+### 1.2.3 Template Class的实例化:我们把通过类型绑定将模板类变成“普通的类”的过程，称之为模板实例化（Template Instantiate）
 ```c++
 vector<int> intArray;
 vector<float> floatArray;
@@ -100,10 +100,43 @@ vector<float> floatArray;
 intArray.push_back(5);
 floatArray.push_back(3.0f);
 ```
+> 变量定义的过程可以分成两步来看：第一步，vector<int>将int绑定到类模板vector上，获得了一个“普通的类vector<int>”;第二步通过“vector”定义了一个变量。 
+```c++
+vector unknownVector; // 错误示例
+```
+### 1.2.4 模板类的成员函数定义  
 
+> 类模板的成员函数和函数模板一样，被第一次调用时才会进行实例化
+```c++
+template <typename T>
+void vector<T>::clear()		// 类外定义
+{
+	// Function body
+}
+```
+> 当我们使用一个类模板时必须提供模板实参，但有一个例外，在类模板自己的作用域中，我们可以直接使用模板名而不提供实参
+```c++
+template <typename T>
+class vector
+{
+public:
+	vector& operator+(const vector &rhs); //类模板作用域中我们可以直接使用模板名vector而不是vector<T>
+	void push_back(T const&);
+	void clear();				
+	
+private:
+	T* elements;
+};
 
-
-
+//类外定义
+//返回类型不在类模板作用域内所以要用vector<T>
+//形参rhs在类模板作用域内所以只用vector就行
+template<typename T>
+vector<T>& vector<T>::operator+(const vector &rhs) 
+{
+	// Functuon body
+}
+```
 
 
 
