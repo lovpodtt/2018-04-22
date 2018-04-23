@@ -11,3 +11,4 @@ int compare(const T &lhs, const T &rhs)
 	return 0;
 }
 ```
+> 模板定义中，模板参数雷彪不能为空
