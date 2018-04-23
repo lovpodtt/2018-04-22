@@ -92,7 +92,8 @@ private:
 	T* elements;
 };
 ```
-### 1.2.3 Template Class的实例化:我们把通过类型绑定将模板类变成“普通的类”的过程，称之为模板实例化（Template Instantiate）
+### 1.2.3 Template Class的实例化
+> 我们把通过类型绑定将模板类变成“普通的类”的过程，称之为模板实例化（Template Instantiate）
 ```c++
 vector<int> intArray;
 vector<float> floatArray;
@@ -137,10 +138,23 @@ vector<T>& vector<T>::operator+(const vector &rhs)
 	// Functuon body
 }
 ```
-
-
-
-
+### 1.2.5 类模板和友元
+#### 一对多关系
+> 如果一个类模板包含一个非模板友元，则友元可以访问所以模板实例
+```c++
+template <typename T>
+class vector
+{
+public:
+	friend get_vecotr_elems_pointer(const vector&);
+	vector& operator+(const vector &rhs); //类模板作用域中我们可以直接使用模板名vector而不是vector<T>
+	void push_back(T const&);
+	void clear();				
+	
+private:
+	T* elements;
+};
+```
 
 
 
