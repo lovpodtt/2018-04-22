@@ -23,5 +23,11 @@ std::cout << compare(1,0) << std::endl;
 ```
 ### 1.3 模板类型参数（type parameter）
 > 我们可以把类型参数看作类型说明符。和类型说明符一样，类型参数可以用来指定返回类型或函数的参数类型，以及在函数体内用于变量声明或类型转换  
-123
+>
+>类型参数前必须使用关键字class或typename，这两个关键字的含义相同，可以互换使用，一个模板参数列表中可以同时使用这两个关键字
+>
+```c++
+template <typename T, class U>
+T example_template(const T &, const U &);
+```
 
