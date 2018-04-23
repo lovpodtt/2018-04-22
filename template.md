@@ -31,4 +31,16 @@ std::cout << compare(1,0) << std::endl;
 template <typename T, class U>
 T example_template(const T &, const U &);
 ```
-
+### 1.4 非类型模板参数（nontype parameter）
+> 一个非类型模板参数表示一个值而非一个类型，我们通过一个特定的类型名而非关键字class或typename来指定非类型参数
+```c++
+template<typename T, unsigned NUM>
+T example_template(const char s[NUM])
+{
+	std::cout << NUM << std::endl;
+}
+```
+> 一个非类型参数可以是一个整形，或者是一个指向对象或函数类型的指针或（左值）引用  
+> 绑定到非类型整形参数的实参必须是一个常量表达式，绑定到指针或引用的非类型参数的实参必须具有静态生存期。我们不能用一个普通（非静态）局部变量
+或动态对象作为指针或引用非类型模板参数的实参。指针参数也可以用nullptr或一个值为0的常量表达式来实例化
+>
