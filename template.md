@@ -155,6 +155,109 @@ private:
 	T* elements;
 };
 ```
+## 2 模板实参推断（template argument deduction）
+### 2.1 类型转换与模板类型参数
+> 对于模板参数类型，除了以下情况，编译器通常不会对实参进行类型转换，而是直接生成一个新的模板实例 ，比如：算数转换、派生类向基类转换，用户自定义转换
+> 顶层const无论在形参中还是在实参中都被忽略  
+> 可以将一个非const对象的引用（或指针）转换成const对象的引用（或指针）  
+> 数组或函数指针转换
+> 注意，如果函数参数不是模板参数，则对实参进行正常的类型转换
+```c++
+template <typename T> T example_obj(T, T)
+template <typename T> T example_ref(const T&, const T&)
+template <typename T> T example_com(T, int)
+int var = 1;
+const int cvar = 2;
+example_obj(var, cvar);	//调用example_obj(int, int),顶层const被忽略
+example_ref(var, cvar);  //调用example_ref(const int&, const int&),非const对象的引用转换成const对象的引用
+
+int mat_lhs[10];
+int mat_rhs[22];
+//形参为对象，数组大小无关，都将转换成int*指针
+example_obj(mat_rhs, mat_lhs);	//调用example_obj(int*, int*),数组向指针转换
+//形参为引用，数组不会转换成指针，所以数组大小也算进类型???????待补充，数组大小相同也不正确
+example_ref(mat_rhs, mat_lhs);	//错误：数组类型不匹配example_ref(int[10], int[22])
+争取
+long lvar = 3;
+std::string svar = " ";
+example_obj(var, lvar);	//错误：模板参数转换无法进行算数转换long->int,无法实例化example_obj(int, long),两个实参类型要相同（或是转换后要相同）
+example_com(svar, lvar);	//正确，调用example_com(string, int),普通参数可以进行算术转换long->int, T为string
+```
+### 2.2 函数模板的显式实参
+> 某些情况下，编译器无法推断出模板实参类型，我们希望允许用户控制模板实例化  
+> 当函数返回类型与参数列表中任何模板参数类型都不同时，编译器无法推断出返回类型,此时必须要为返回类型提供一个显示模板参数
+```c++
+template <typename T1, typename T2, typename T3>
+T1 example(T2, T3);
+
+auto result = example(1, 2);	//错误：无法推断出返回类型T1的类型
+auto result = example<int>(1, 2);	//正确：调用example<int, const int, const int>
+```
+>对于模板类型参数已经显式指定了的函数参数，可以进行正常的类型转换
+```c++
+template <typename T> T example_obj(T, T)
+
+long lvar = 1;
+int var = 2;
+
+example_obj(var, lvar);	//错误：模板参数转换无法进行算数转换long->int
+example_obj<int>(var, lvar);	//正确：模板类型参数已经显式指定了的函数参数可以进行算数转换long->int，example_obj(int, int)
+example_obj<long>(var, lvar);	//example_obj(long, long)
+```
+### 2.3 函数指针与实参推断
+> 当我们用函数模板给函数指针初始化或赋值时，编译器将用函数指针类型来推断模板实参
+```c++
+template <typename T> int example_ref(const T&, const T&);
+//使用example_ref<int, int>初始化pfun
+int (*pfun)(const int&, const int&) = example_ref;
+```
+> 当参数是一个函数模板实例的地址时，程序上下文必须满足：对每个模板参数能唯一确定其类型或值
+```c++
+//func的重载版本
+void func(int(*)(const int&, const int&))
+void func(int(*)(const std::string&, const std::string&))
+//错误：对函数指针类型的形参初始化时不能确定唯一实例化版本，编译失败
+func(example_ref)	//example_ref<std::string>还是example_ref<int>?
+```
+> 我们可以通过使用显式模板实参来消除func调用的歧义
+```c++
+//正确：传递example_ref<std::string>
+func(example_ref<std::string>)
+```
+### 2.4 引用与模板实参推断
+### 2.4.1 从左值引用函数参数推断类型
+> 当一个函数参数时模板类型参数的一个左值引用时(T&),我们只能传给它一个左值，实参可以是const类型，也可以不是。如果是，T会被推断为const类型
+```c++
+template <typename T>
+void example_ref_left(T&);
+
+example_ref_left(var)	//T:int
+example_ref_left(cvar)	//T:const int
+example_ref_left(5)	//错误：传递给T&的实参必须时左值
+```
+> 如果一个函数参数的类型为const T&,那么我们可以传递给它任何类型的实参——对象（const或非const），临时对象或字面值常量  
+> 当传入实参本时const时，T的类型不会时一个const类型，因为const已经是函数参数类型的一部分了，所以它不会也是模板参数类型的一部分  
+> 函数参数类型为const &T,模板参数类型为T
+```c++
+template <typename T>
+void example_ref_Cleft(const T&);
+//每个函数参数都为const int&
+example_ref_Cleft(var)	//T:int
+example_ref_Cleft(cvar)	//T:int
+example_ref_Cleft(5)	//T:int
+```
+### 2.4.1 从右值引用函数参数推断类型
+> 当一个函数参数是一个右值引用（T&&），我们可以传递给它一个右值，推断过程类似于左值
+```c++
+template <typename T>
+void example_ref_right(T&&);
+
+example_ref_right(5)	//T:int
+```
+
+
+
+
 
 
 
