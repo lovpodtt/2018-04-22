@@ -254,7 +254,22 @@ void example_ref_right(T&&);
 
 example_ref_right(5)	//T:int
 ```
-
+### 2.5 模板特例化
+> 当我们不希望使用模板版本时，可以定义类或函数模板的一个特例化版本
+```c++
+//定义模板
+template <typename T>
+void example_ref_Cleft(const T&)
+{
+	//do something
+}
+//特例化int
+template <>
+void example_ref_Cleft(const int&)
+{
+	//do something else
+};
+```
 
 
 
